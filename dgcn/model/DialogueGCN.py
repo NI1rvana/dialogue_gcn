@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 
+import torch.nn.functional as nn_func
+
 from .SeqContext import SeqContext
 from .EdgeAtt import EdgeAtt
 from .GCN import GCN
@@ -12,19 +14,21 @@ log = dgcn.utils.get_logger()
 
 
 class DialogueGCN(nn.Module):
-
     def __init__(self, args):
         super(DialogueGCN, self).__init__()
-        u_dim = 100
+        u_dim = 1024
         g_dim = 200
         h1_dim = 100
         h2_dim = 100
         hc_dim = 100
         tag_size = 6
 
+        # self.audio_proj = nn.Linear(128, 50)  # 音频特征降维
+        # self.visual_proj = nn.Linear(2048, 50)  # 视觉特征降维
+        # self.multimodal_fc = nn.Linear(u_dim + 50 + 50, u_dim)  # 融合层
         self.wp = args.wp
         self.wf = args.wf
-        self.device = args.device
+        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
         self.rnn = SeqContext(u_dim, g_dim, args)
         self.edge_att = EdgeAtt(g_dim, args)
@@ -43,7 +47,7 @@ class DialogueGCN(nn.Module):
         node_features = self.rnn(data["text_len_tensor"], data["text_tensor"]) # [batch_size, mx_len, D_g]
         features, edge_index, edge_norm, edge_type, edge_index_lengths = batch_graphify(
             node_features, data["text_len_tensor"], data["speaker_tensor"], self.wp, self.wf,
-            self.edge_type_to_idx, self.edge_att, self.device)
+            self.edge_type_to_idx, self.edge_att, 'cuda' if torch.cuda.is_available() else 'cpu')
 
         graph_out = self.gcn(features, edge_index, edge_norm, edge_type)
 

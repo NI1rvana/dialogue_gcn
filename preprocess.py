@@ -13,7 +13,7 @@ def split():
 
     video_ids, video_speakers, video_labels, video_text, \
         video_audio, video_visual, video_sentence, trainVids, \
-        test_vids = pickle.load(open('data/iemocap/IEMOCAP_features.pkl', 'rb'), encoding='latin1')
+        test_vids = pickle.load(open('data/iemocap/IEMOCAP_feat1024+v342+a1024.pkl', 'rb'), encoding='latin1')
 
     train, dev, test = [], [], []
     dev_size = int(len(trainVids) * 0.1)

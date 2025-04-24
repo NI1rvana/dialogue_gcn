@@ -11,7 +11,7 @@ class EdgeAtt(nn.Module):
 
     def __init__(self, g_dim, args):
         super(EdgeAtt, self).__init__()
-        self.device = args.device
+        self.device = ('cuda' if torch.cuda.is_available() else 'cpu')
         self.wp = args.wp
         self.wf = args.wf
 
@@ -34,7 +34,7 @@ class EdgeAtt(nn.Module):
                 tmp = att_matrix[i, s: e + 1, :]  # [L', D_g]
                 feat = node_features[i, j]  # [D_g]
                 score = torch.matmul(tmp, feat)
-                probs = F.softmax(score)  # [L']
+                probs = F.softmax(score, dim = 0)  # [L']
                 alpha[j, s: e + 1] = probs
             alphas.append(alpha)
         # alphas = torch.ones(batch_size, mx_len, 110).to(self.device)

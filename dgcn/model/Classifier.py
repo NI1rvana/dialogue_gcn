@@ -16,7 +16,7 @@ class Classifier(nn.Module):
         self.lin2 = nn.Linear(hidden_size, tag_size)
         if args.class_weight:
             self.loss_weights = torch.tensor([1 / 0.086747, 1 / 0.144406, 1 / 0.227883,
-                                              1 / 0.160585, 1 / 0.127711, 1 / 0.252668]).to(args.device)
+                                              1 / 0.160585, 1 / 0.127711, 1 / 0.252668]).to('cuda' if torch.cuda.is_available() else 'cpu')
             self.nll_loss = nn.NLLLoss(self.loss_weights)
         else:
             self.nll_loss = nn.NLLLoss()

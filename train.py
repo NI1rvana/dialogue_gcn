@@ -4,6 +4,10 @@ import torch
 
 import dgcn
 
+import os
+# 仅设置一块可见
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+
 log = dgcn.utils.get_logger()
 
 
@@ -14,14 +18,14 @@ def main(args):
     log.debug("Loading data from '%s'." % args.data)
     data = dgcn.utils.load_pkl(args.data)
     log.info("Loaded data.")
-
+    device = ('cuda' if torch.cuda.is_available() else 'cpu')
     trainset = dgcn.Dataset(data["train"], args.batch_size)
     devset = dgcn.Dataset(data["dev"], args.batch_size)
     testset = dgcn.Dataset(data["test"], args.batch_size)
-
+    log.info(trainset)
     log.debug("Building model...")
     model_file = "./save/model.pt"
-    model = dgcn.DialogueGCN(args).to(args.device)
+    model = dgcn.DialogueGCN(args).to('cuda' if torch.cuda.is_available() else 'cpu')
     opt = dgcn.Optim(args.learning_rate, args.max_grad_value, args.weight_decay)
     opt.set_parameters(model.parameters(), args.optimizer)
 
@@ -32,6 +36,8 @@ def main(args):
 
     # Train.
     log.info("Start training...")
+    log.info(trainset)
+
     ret = coach.train()
 
     # Save.

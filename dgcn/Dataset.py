@@ -1,6 +1,7 @@
 import math
 import random
 
+import numpy as np
 import torch
 
 
@@ -29,7 +30,7 @@ class Dataset:
         batch_size = len(samples)
         text_len_tensor = torch.tensor([len(s.text) for s in samples]).long()
         mx = torch.max(text_len_tensor).item()
-        text_tensor = torch.zeros((batch_size, mx, 100))
+        text_tensor = torch.zeros((batch_size, mx, 1024))
         speaker_tensor = torch.zeros((batch_size, mx)).long()
         labels = []
         for i, s in enumerate(samples):
